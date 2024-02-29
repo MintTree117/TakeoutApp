@@ -17,9 +17,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Domain\" />
-      <Folder Include="Features\" />
-      <Folder Include="Persistence\" />
+      <Folder Include="Domain\ValueObjects\" />
+      <Folder Include="Features\AccountModification\" />
+      <Folder Include="Features\Authentication\" />
+      <Folder Include="Features\Checkout\" />
+      <Folder Include="Features\EditMenu\" />
+      <Folder Include="Features\OrderPlacement\" />
+      <Folder Include="Features\Registration\" />
+      <Folder Include="Features\UpdateCart\" />
       <Folder Include="Services\" />
     </ItemGroup>
 
