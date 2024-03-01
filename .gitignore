@@ -1,0 +1,56 @@
+# Binaries and Object files
+bin/
+obj/
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# MSTest, NUnit
+[Tt]est[Rr]esult*/
+*.VisualState.xml
+TestResult.xml
+nunit-*
+
+# Build Results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+# NuGet Packages
+**/[Pp]ackages/
+*.nupkg
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Ignore Visual Studio temporary files
+*.cache
+*.csproj.user
+*.vbproj.user
+*.sqlproj.user
+
+# Others
+*.log
+*.sqldb
+*.sqlite
+*.db
+
