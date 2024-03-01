@@ -1,3 +1,4 @@
+using Api.Errors;
 using Api.Features.ViewMenu;
 using API.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<EfContext>( ( options ) =>
 
 WebApplication app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapReadMenuEndpoints();
 
 if ( app.Environment.IsDevelopment() )
