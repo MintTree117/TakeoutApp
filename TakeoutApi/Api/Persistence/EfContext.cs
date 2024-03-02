@@ -1,9 +1,10 @@
 using Api.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Persistence;
 
-public sealed class EfContext : DbContext
+public sealed class EfContext : IdentityDbContext
 {
     public EfContext( DbContextOptions<EfContext> options ) : base( options )
     {

@@ -22,14 +22,8 @@
 
     <ItemGroup>
       <Folder Include="Domain\ValueObjects\" />
-      <Folder Include="Features\AccountModification\" />
-      <Folder Include="Features\Authentication\" />
-      <Folder Include="Features\Checkout\" />
-      <Folder Include="Features\EditMenu\" />
-      <Folder Include="Features\OrderPlacement\" />
-      <Folder Include="Features\Registration\" />
-      <Folder Include="Features\UpdateCart\" />
-      <Folder Include="Services\" />
+      <Folder Include="Features\Ordering\" />
+      <Folder Include="Persistence\Migrations\" />
     </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@ using Api.Errors;
 using API.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Features.ViewMenu;
+namespace Api.Features.Menu;
 
 public static class ReadMenuEndpoints
 {
