@@ -1,1 +1,17 @@
 ﻿@page "/"
+@using Application.Models
+
+<div class="d-flex flex-column flex-md-row">
+    <ul class="d-flex flex-row flex-md-column list-unstyled">
+        @foreach ( MenuCategory c in _categories )
+        {
+            <li>@c.Name</li>
+        }
+    </ul>
+    <ul class="d-flex flex-column list-unstyled">
+        @foreach ( MenuItem i in _items )
+        {
+            <MenuItemCard Item="@i"></MenuItemCard>
+        }
+    </ul>
+</div>

@@ -1,0 +1,27 @@
+@using Application.Models
+
+<li class="d-flex flex-row align-items-center justify-content-between">
+    <img data-src="placeholder-image.jpg" src="@Item.ImageUrl" alt="@Item.Name" style="max-width: 100px; max-height: 100px;"/>
+    <div>
+        <h4>@Item.Name</h4>
+        <p>@Item.Description</p>
+        
+        <div>
+            @if ( Item.SalePrice is not null )
+            {
+                <span class="text-muted">@Item.Price</span>
+                <span class="text-success">@Item.SalePrice</span>
+            }
+            else
+            {
+                <span class="text-success">@Item.SalePrice</span>
+            }
+        </div>
+    </div>
+</li>
+
+@code
+{
+    [Parameter]
+    public MenuItem Item { get; set; } = null!;
+}
