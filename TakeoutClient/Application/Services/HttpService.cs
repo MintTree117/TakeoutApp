@@ -4,7 +4,7 @@ using System.Web;
 
 namespace Application.Services;
 
-public class HttpService( HttpClient Http, ILogger logger ) : IHttpService
+public class HttpService( HttpClient Http, ILogger<HttpService> logger ) : IHttpService
 {
     public async Task<ServiceReply<T?>> TryGetRequest<T>( string apiPath, Dictionary<string, object>? parameters = null )
     {
