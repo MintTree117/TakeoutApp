@@ -4,14 +4,15 @@ using System.Web;
 
 namespace Application.Services;
 
-public class HttpService( HttpClient Http, ILogger<HttpService> logger ) : IHttpService
+public sealed class HttpService( HttpClient _http, ILogger<HttpService> _logger ) : IHttpService
 {
-    public async Task<ServiceReply<T?>> TryGetRequest<T>( string apiPath, Dictionary<string, object>? parameters = null )
+    public async Task<ServiceReply<T?>> TryGetRequest<T>( string apiPath, Dictionary<string, object>? parameters = null, string? authToken = null )
     {
         try
         {
+            SetAuthHttpHeader( authToken );
             string path = GetQueryParameters( apiPath, parameters );
-            HttpResponseMessage httpResponse = await Http.GetAsync( path );
+            HttpResponseMessage httpResponse = await _http.GetAsync( path );
             return await HandleHttpResponse<T?>( httpResponse, "Get" );
         }
         catch ( Exception e )
@@ -19,11 +20,12 @@ public class HttpService( HttpClient Http, ILogger<HttpService> logger ) : IHttp
             return HandleHttpException<T?>( e, "Get" );
         }
     }
-    public async Task<ServiceReply<T?>> TryPostRequest<T>( string apiPath, object? body = null )
+    public async Task<ServiceReply<T?>> TryPostRequest<T>( string apiPath, object? body = null, string? authToken = null )
     {
         try
         {
-            HttpResponseMessage httpResponse = await Http.PostAsJsonAsync( apiPath, body );
+            SetAuthHttpHeader( authToken );
+            HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( apiPath, body );
             return await HandleHttpResponse<T?>( httpResponse, "Post" );
         }
         catch ( Exception e )
@@ -31,11 +33,12 @@ public class HttpService( HttpClient Http, ILogger<HttpService> logger ) : IHttp
             return HandleHttpException<T?>( e, "Post" );
         }
     }
-    public async Task<ServiceReply<T?>> TryPutRequest<T>( string apiPath, object? body = null )
+    public async Task<ServiceReply<T?>> TryPutRequest<T>( string apiPath, object? body = null, string? authToken = null )
     {
         try
         {
-            HttpResponseMessage httpResponse = await Http.PutAsJsonAsync( apiPath, body );
+            SetAuthHttpHeader( authToken );
+            HttpResponseMessage httpResponse = await _http.PutAsJsonAsync( apiPath, body );
             return await HandleHttpResponse<T?>( httpResponse, "Put" );
         }
         catch ( Exception e )
@@ -43,12 +46,13 @@ public class HttpService( HttpClient Http, ILogger<HttpService> logger ) : IHttp
             return HandleHttpException<T?>( e, "Put" );
         }
     }
-    public async Task<ServiceReply<T?>> TryDeleteRequest<T>( string apiPath, Dictionary<string, object>? parameters = null )
+    public async Task<ServiceReply<T?>> TryDeleteRequest<T>( string apiPath, Dictionary<string, object>? parameters = null, string? authToken = null )
     {
         try
         {
+            SetAuthHttpHeader( authToken );
             string path = GetQueryParameters( apiPath, parameters );
-            HttpResponseMessage httpResponse = await Http.DeleteAsync( path );
+            HttpResponseMessage httpResponse = await _http.DeleteAsync( path );
             return await HandleHttpResponse<T?>( httpResponse, "Delete" );
         }
         catch ( Exception e )
@@ -92,34 +96,40 @@ public class HttpService( HttpClient Http, ILogger<HttpService> logger ) : IHttp
         switch ( httpResponse.StatusCode )
         {
             case System.Net.HttpStatusCode.BadRequest:
-                logger.LogError( $"{requestTypeName}: Bad request: {errorContent}" );
+                _logger.LogError( $"{requestTypeName}: Bad request: {errorContent}" );
                 return new ServiceReply<T?>( ServiceErrorType.ValidationError, errorContent );
 
             case System.Net.HttpStatusCode.NotFound:
-                logger.LogError( $"{requestTypeName}: Not found: {errorContent}" );
+                _logger.LogError( $"{requestTypeName}: Not found: {errorContent}" );
                 return new ServiceReply<T?>( ServiceErrorType.NotFound, errorContent );
 
             case System.Net.HttpStatusCode.Unauthorized:
-                logger.LogError( $"{requestTypeName}: Unauthorized: {errorContent}" );
+                _logger.LogError( $"{requestTypeName}: Unauthorized: {errorContent}" );
                 return new ServiceReply<T?>( ServiceErrorType.Unauthorized, errorContent );
 
             case System.Net.HttpStatusCode.Conflict:
-                logger.LogError( $"{requestTypeName}: Conflict: {errorContent}" );
+                _logger.LogError( $"{requestTypeName}: Conflict: {errorContent}" );
                 return new ServiceReply<T?>( ServiceErrorType.Conflict, errorContent );
 
             case System.Net.HttpStatusCode.InternalServerError:
-                logger.LogError( $"{requestTypeName}: Server error: {errorContent}" );
+                _logger.LogError( $"{requestTypeName}: Server error: {errorContent}" );
                 return new ServiceReply<T?>( ServiceErrorType.ServerError, errorContent );
 
             default:
-                logger.LogError( $"{requestTypeName}: Other error: {httpResponse.StatusCode}, Content: {errorContent}" );
+                _logger.LogError( $"{requestTypeName}: Other error: {httpResponse.StatusCode}, Content: {errorContent}" );
                 return new ServiceReply<T?>( ServiceErrorType.ServerError, $"Error: {httpResponse.StatusCode}" );
         }
     }
     
     ServiceReply<T?> HandleHttpException<T>( Exception e, string requestType )
     {
-        logger.LogError( e, $"{requestType}: Exception occurred while sending API request." );
+        _logger.LogError( e, $"{requestType}: Exception occurred while sending API request." );
         return new ServiceReply<T?>( ServiceErrorType.ServerError, e.Message );
+    }
+    void SetAuthHttpHeader( string? token )
+    {
+        _http.DefaultRequestHeaders.Authorization = !string.IsNullOrWhiteSpace( token )
+            ? new System.Net.Http.Headers.AuthenticationHeaderValue( "Bearer", token )
+            : null;
     }
 }

@@ -1,0 +1,63 @@
+@using Application.Pages
+@implements IDisposable
+
+@if ( !string.IsNullOrWhiteSpace( _message ) )
+{
+    <div class="flex-grow-1 d-flex align-items-center justify-content-between mb-0 @GetAlertCss()" role="alert">
+        <div>
+            @_message
+        </div>
+        <button class="btn ms-2 @GetButtonCss()" @onclick="Close">
+            <i class="oi oi-x"></i>
+        </button>
+    </div>
+}
+
+@code 
+{
+    [Parameter] public PageBase Page { get; set; } = null!;
+
+    string _message = string.Empty;
+    AlertType _type = AlertType.Success;
+
+    public void Dispose()
+    {
+        Page.OnAlert -= OnAlert;
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Page.OnAlert += OnAlert;
+    }
+
+    void OnAlert( AlertType type, string message )
+    {
+        _type = type;
+        _message = message;
+    }
+    void Close()
+    {
+        _message = string.Empty;
+    }
+    
+    string GetAlertCss()
+    {
+        return _type switch
+        {
+            AlertType.Success => "alert-success",
+            AlertType.Warning => "alert-warning",
+            AlertType.Danger => "alert-danger",
+            _ => ""
+        };
+    }
+    string GetButtonCss()
+    {
+        return _type switch
+        {
+            AlertType.Success => "btn-outline-success",
+            AlertType.Warning => "btn-outline-warning",
+            AlertType.Danger => "btn-outline-danger",
+            _ => ""
+        };
+    }
+}

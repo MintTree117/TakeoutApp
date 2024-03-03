@@ -36,7 +36,7 @@ public record ServiceReply<T>
     }
 
     public bool Success { get; init; }
-    public string? Message { get; init; }
+    public string Message { get; init; } = string.Empty;
     public T? Data { get; init; }
     public ServiceErrorType ErrorType { get; init; } = ServiceErrorType.None;
 
