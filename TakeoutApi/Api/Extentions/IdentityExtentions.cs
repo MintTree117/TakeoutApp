@@ -10,7 +10,12 @@ namespace Api.Extentions
     {
         public static IServiceCollection AddIdentityServices( this IServiceCollection services, IConfiguration config )
         {
-            services.AddIdentityCore<IdentityUser>( opt => { opt.Password.RequireDigit = true; } )
+            services.AddIdentityCore<IdentityUser>( opt => {
+                    opt.Password.RequireLowercase = true;
+                    opt.Password.RequireUppercase = true;
+                    opt.Password.RequireDigit = true;
+                    opt.Password.RequiredUniqueChars = 1;
+                } )
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<EfContext>()
                 .AddSignInManager<SignInManager<IdentityUser>>()
