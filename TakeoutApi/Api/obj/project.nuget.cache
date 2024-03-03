@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "H9fhV1jztGj65QNH2fo83jokWBPqTXvbEI3ybx6YEBmqOOz8z51lsX1h8b0Gfn8w9Bu5PDNzQoGDuiYPWeYywg==",
+  "dgSpecHash": "B8At6N9rJ3AizV6n9ygCdjHAEXx6D7flpUczsndx/oLEBhhMs2wSqvsZ6svl7mVwZmKEeAnBAC0n7l6oEHyJnw==",
   "success": true,
   "projectFilePath": "/home/martin/CodeProjects/TakeoutApp/TakeoutApi/Api/Api.csproj",
   "expectedPackageFiles": [
