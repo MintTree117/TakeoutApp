@@ -1,5 +1,6 @@
 using Api.Errors;
 using Core.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Menu;

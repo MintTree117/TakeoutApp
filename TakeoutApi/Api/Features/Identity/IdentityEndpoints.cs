@@ -8,6 +8,10 @@ public static class IdentityEndpoints
 {
     public static void MapIdentityEndpoints( this IEndpointRouteBuilder app )
     {
+        app.MapPost( "api/email-exists",
+            async ( string email, UserManager<IdentityUser> userManager ) => 
+                Results.Ok( await userManager.FindByEmailAsync( email ) is not null ) );
+        
         app.MapPost( "api/login", 
             async ( LoginDto login, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IJwtService jwtService ) => {
                 IdentityUser? user = await userManager.FindByEmailAsync( login.Email );

@@ -15,8 +15,6 @@ builder.Services.AddIdentityServices( builder.Configuration );
 WebApplication app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
-app.MapReadMenuEndpoints();
-app.MapIdentityEndpoints();
 
 if ( app.Environment.IsDevelopment() )
 {
@@ -24,8 +22,12 @@ if ( app.Environment.IsDevelopment() )
     app.UseSwaggerUI();
 }
 
+app.UseCors( "CorsPolicy" );
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapReadMenuEndpoints();
+app.MapIdentityEndpoints();
 
 app.UseHttpsRedirection();
 
