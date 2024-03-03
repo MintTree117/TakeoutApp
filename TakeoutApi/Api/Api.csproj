@@ -23,7 +23,6 @@
     <ItemGroup>
       <Folder Include="Domain\ValueObjects\" />
       <Folder Include="Features\Ordering\" />
-      <Folder Include="Persistence\Migrations\" />
     </ItemGroup>
 
 </Project>

@@ -6,7 +6,7 @@ namespace Api.Features.Identity;
 
 public static class IdentityEndpoints
 {
-    public static void MapReadMenuEndpoints( this IEndpointRouteBuilder app )
+    public static void MapIdentityEndpoints( this IEndpointRouteBuilder app )
     {
         app.MapPost( "api/login", 
             async ( LoginDto login, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IJwtService jwtService ) => {

@@ -1,5 +1,6 @@
 using Api.Errors;
 using Api.Extentions;
+using Api.Features.Identity;
 using Api.Features.Menu;
 using API.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,7 @@ WebApplication app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.MapReadMenuEndpoints();
+app.MapIdentityEndpoints();
 
 if ( app.Environment.IsDevelopment() )
 {
