@@ -1,5 +1,5 @@
 using Api.Errors;
-using API.Persistence;
+using Core.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Menu;

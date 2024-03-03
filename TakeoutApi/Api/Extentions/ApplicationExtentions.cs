@@ -1,5 +1,5 @@
 using Api.Features.Identity;
-using API.Persistence;
+using Core.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Extentions;

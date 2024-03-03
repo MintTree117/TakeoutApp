@@ -1,8 +1,8 @@
-using Api.Domain.Entities;
+using Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace API.Persistence;
+namespace Core.Persistence;
 
 public sealed class EfContext : IdentityDbContext
 {

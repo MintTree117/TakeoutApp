@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace API.Persistence;
+namespace Core.Persistence;
 
 public class IdentitySeed
 {

@@ -1,5 +1,5 @@
 using System.Text;
-using API.Persistence;
+using Core.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;

@@ -1,24 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Api.Domain.Entities;
+namespace Core.Domain.Entities;
 
-public sealed class MenuItem
+public sealed class MenuOption
 {
     public int Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public decimal Price { get; private set; }
     public decimal? SalePrice { get; private set; }
-    public string? ImageUrl { get; private set; } = string.Empty;
 
-    public MenuCategory MenuCategory { get; private set; } = null!;
-    public int MenuCategoryId { get; private set; }
+    public MenuOptionGroup MenuOptionGroup { get; private set; } = null!;
+    public int MenuOptionGroupId { get; private set; }
 
-    public List<MenuOptionGroup> MenuOptionGroups { get; set; } = [ ];
-
-    public class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
+    public class MenuOptionConfiguration : IEntityTypeConfiguration<MenuOption>
     {
-        public void Configure( EntityTypeBuilder<MenuItem> builder )
+        public void Configure( EntityTypeBuilder<MenuOption> builder )
         {
             builder
                 .Property( i => i.Id )
@@ -28,9 +25,6 @@ public sealed class MenuItem
                 .IsRequired()
                 .HasMaxLength( 64 );
             builder
-                .Property( i => i.ImageUrl )
-                .HasMaxLength( 120 );
-            builder
                 .Property( i => i.Price )
                 .IsRequired()
                 .HasColumnType( "decimal(18,2)" );
@@ -38,12 +32,9 @@ public sealed class MenuItem
                 .Property( i => i.SalePrice )
                 .HasColumnType( "decimal(18,2)" );
             builder
-                .HasOne( c => c.MenuCategory )
+                .HasOne( c => c.MenuOptionGroup )
                 .WithMany()
-                .HasForeignKey( i => i.MenuCategoryId );
-            builder
-                .HasMany( i => i.MenuOptionGroups )
-                .WithMany( g => g.MenuItems );
+                .HasForeignKey( i => i.MenuOptionGroupId );
         }
     }
 }

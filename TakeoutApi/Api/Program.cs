@@ -2,7 +2,7 @@ using Api.Errors;
 using Api.Extentions;
 using Api.Features.Identity;
 using Api.Features.Menu;
-using API.Persistence;
+using Core.Persistence;
 using Microsoft.AspNetCore.Identity;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder( args );

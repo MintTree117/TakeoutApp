@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Api.Domain.Entities;
+namespace Core.Domain.Entities;
 
 public sealed class MenuCategory
 {
