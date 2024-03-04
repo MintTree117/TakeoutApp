@@ -1,4 +1,4 @@
-using Application.Dtos;
+using Application.Models;
 using Application.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -7,34 +7,33 @@ namespace Application.Pages;
 public sealed partial class LoginRegister : PageBase
 {
     [Inject] NavigationManager Navigation { get; init; } = default!;
-    [Inject] IHttpService HttpService { get; init; } = default!;
-    [Inject] IIdentityManager IdentityManager { get; init; } = default!;
-    [Inject] ICartManager CartManager { get; init; } = default!;
+    [Inject] IdentityManager IdentityManager { get; init; } = default!;
+    [Inject] CartManager CartManager { get; init; } = default!;
 
-    readonly LoginDto _loginDto = new();
-    readonly RegisterDto _registerDto = new();
+    readonly Login _login = new();
+    readonly Register _register = new();
 
     async Task Login()
     {
-        UserDto? user = await IdentityManager.Login( _loginDto );
+        ApiReply<User?> reply = await IdentityManager.Login( _login );
         
-        if ( user is null )
+        if ( reply.Data is null )
         {
-            Alert( AlertType.Danger, "An error occured!" );
+            Alert( AlertType.Danger, reply.Details() );
             return;
         }
-        
-        await CartManager.UpdateServerCart( user );
 
+        await CartManager.GetCart( reply.Data.Token );
+        
         Navigation.NavigateTo( "/" );
     }
     async Task Register()
     {
-        ServiceReply<UserDto?> registerReply = await HttpService.TryPostRequest<UserDto>( "api/users/register", _registerDto );
-
-        if ( registerReply.Data is null )
+        ApiReply<bool> reply = await IdentityManager.Register( _register );
+        
+        if ( !reply.Data )
         {
-            Alert( AlertType.Danger, registerReply.Message );
+            Alert( AlertType.Danger, reply.Details() );
             return;
         }
 

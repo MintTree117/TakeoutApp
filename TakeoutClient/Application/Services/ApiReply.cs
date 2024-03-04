@@ -11,16 +11,16 @@ public enum ServiceErrorType
     ServerError
 }
 
-public record ServiceReply<T>
+public record ApiReply<T>
 {
     const string MESSAGE_RESPONSE_ERROR = "Failed to produce a proper response message!";
 
-    public ServiceReply()
+    public ApiReply()
     {
 
     }
 
-    public ServiceReply( ServiceErrorType errorType, string? message = null )
+    public ApiReply( ServiceErrorType errorType, string? message = null )
     {
         Data = default;
         Success = false;
@@ -28,7 +28,7 @@ public record ServiceReply<T>
         Message = message ?? GetDefaultMessage( errorType );
     }
 
-    public ServiceReply( T data )
+    public ApiReply( T data )
     {
         Data = data;
         Success = true;
@@ -39,6 +39,11 @@ public record ServiceReply<T>
     public string Message { get; init; } = string.Empty;
     public T? Data { get; init; }
     public ServiceErrorType ErrorType { get; init; } = ServiceErrorType.None;
+
+    public string Details()
+    {
+        return $"{ErrorType} : {Message}";
+    }
 
     static string GetDefaultMessage( ServiceErrorType errorType )
     {

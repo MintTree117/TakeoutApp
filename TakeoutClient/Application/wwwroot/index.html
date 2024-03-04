@@ -28,6 +28,12 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        function scrollToCategory(categoryId) {
+            document.getElementById(categoryId).scrollIntoView({behavior: 'smooth'});
+        }
+    </script>
+
 </body>
 
 </html>

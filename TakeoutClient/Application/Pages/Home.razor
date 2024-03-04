@@ -3,16 +3,46 @@
 @inherits PageBase
 
 <div class="d-flex flex-column flex-md-row">
+    <MessageBox Page="@this"/>
+
     <ul class="d-flex flex-row flex-md-column list-unstyled">
         @foreach ( MenuCategory c in _categories )
         {
-            <li>@c.Name</li>
+            <li>
+                <button class="btn btn-link link-dark" onclick="@(async () => await ScrollToCategory( c.Id ) )">
+                    @c.Name
+                </button>
+            </li>
         }
     </ul>
+    
     <ul class="d-flex flex-column list-unstyled">
-        @foreach ( MenuItem i in _items )
+        @foreach ( MenuCategory c in _categories )
         {
-            <MenuItemCard Item="@i"></MenuItemCard>
+            IEnumerable<MenuItem> items = _items.Where( i => i.CategoryId == c.Id );
+
+            foreach ( MenuItem i in items )
+            {
+                <li class="d-flex flex-row align-items-center justify-content-between">
+                    <img data-src="placeholder-image.jpg" src="@i.ImageUrl" alt="@i.Name" style="max-width: 100px; max-height: 100px;"/>
+                    <div>
+                        <h4>@i.Name</h4>
+                        <p>@i.Description</p>
+                        
+                        <div>
+                            @if ( i.SalePrice is not null )
+                            {
+                                <span class="text-muted">@i.Price</span>
+                                <span class="text-success">@i.SalePrice</span>
+                            }
+                            else
+                            {
+                                <span class="text-success">@i.SalePrice</span>
+                            }
+                        </div>
+                    </div>
+                </li>
+            }
         }
     </ul>
 </div>

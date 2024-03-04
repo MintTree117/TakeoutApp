@@ -4,9 +4,9 @@ using System.Web;
 
 namespace Application.Services;
 
-public sealed class HttpService( HttpClient _http, ILogger<HttpService> _logger ) : IHttpService
+public sealed class HttpService( HttpClient _http, ILogger<HttpService> _logger )
 {
-    public async Task<ServiceReply<T?>> TryGetRequest<T>( string apiPath, Dictionary<string, object>? parameters = null, string? authToken = null )
+    public async Task<ApiReply<T?>> TryGetRequest<T>( string apiPath, Dictionary<string, object>? parameters = null, string? authToken = null )
     {
         try
         {
@@ -20,7 +20,7 @@ public sealed class HttpService( HttpClient _http, ILogger<HttpService> _logger 
             return HandleHttpException<T?>( e, "Get" );
         }
     }
-    public async Task<ServiceReply<T?>> TryPostRequest<T>( string apiPath, object? body = null, string? authToken = null )
+    public async Task<ApiReply<T?>> TryPostRequest<T>( string apiPath, object? body = null, string? authToken = null )
     {
         try
         {
@@ -33,7 +33,7 @@ public sealed class HttpService( HttpClient _http, ILogger<HttpService> _logger 
             return HandleHttpException<T?>( e, "Post" );
         }
     }
-    public async Task<ServiceReply<T?>> TryPutRequest<T>( string apiPath, object? body = null, string? authToken = null )
+    public async Task<ApiReply<T?>> TryPutRequest<T>( string apiPath, object? body = null, string? authToken = null )
     {
         try
         {
@@ -46,7 +46,7 @@ public sealed class HttpService( HttpClient _http, ILogger<HttpService> _logger 
             return HandleHttpException<T?>( e, "Put" );
         }
     }
-    public async Task<ServiceReply<T?>> TryDeleteRequest<T>( string apiPath, Dictionary<string, object>? parameters = null, string? authToken = null )
+    public async Task<ApiReply<T?>> TryDeleteRequest<T>( string apiPath, Dictionary<string, object>? parameters = null, string? authToken = null )
     {
         try
         {
@@ -75,20 +75,20 @@ public sealed class HttpService( HttpClient _http, ILogger<HttpService> _logger 
 
         return $"{apiPath}?{query}";
     }
-    async Task<ServiceReply<T?>> HandleHttpResponse<T>( HttpResponseMessage httpResponse, string requestTypeName )
+    async Task<ApiReply<T?>> HandleHttpResponse<T>( HttpResponseMessage httpResponse, string requestTypeName )
     {
         if ( typeof( T ) == typeof( string ) )
         {
             var responseString = await httpResponse.Content.ReadAsStringAsync();
-            return new ServiceReply<T?>( ( T ) ( object ) responseString );
+            return new ApiReply<T?>( ( T ) ( object ) responseString );
         }
         else if ( httpResponse.IsSuccessStatusCode )
         {
             var getReply = await httpResponse.Content.ReadFromJsonAsync<T>();
 
             return getReply is not null
-                ? new ServiceReply<T?>( getReply )
-                : new ServiceReply<T?>( ServiceErrorType.NotFound, "No data returned from request" );
+                ? new ApiReply<T?>( getReply )
+                : new ApiReply<T?>( ServiceErrorType.NotFound, "No data returned from request" );
         }
         
         string errorContent = await httpResponse.Content.ReadAsStringAsync();
@@ -97,34 +97,34 @@ public sealed class HttpService( HttpClient _http, ILogger<HttpService> _logger 
         {
             case System.Net.HttpStatusCode.BadRequest:
                 _logger.LogError( $"{requestTypeName}: Bad request: {errorContent}" );
-                return new ServiceReply<T?>( ServiceErrorType.ValidationError, errorContent );
+                return new ApiReply<T?>( ServiceErrorType.ValidationError, errorContent );
 
             case System.Net.HttpStatusCode.NotFound:
                 _logger.LogError( $"{requestTypeName}: Not found: {errorContent}" );
-                return new ServiceReply<T?>( ServiceErrorType.NotFound, errorContent );
+                return new ApiReply<T?>( ServiceErrorType.NotFound, errorContent );
 
             case System.Net.HttpStatusCode.Unauthorized:
                 _logger.LogError( $"{requestTypeName}: Unauthorized: {errorContent}" );
-                return new ServiceReply<T?>( ServiceErrorType.Unauthorized, errorContent );
+                return new ApiReply<T?>( ServiceErrorType.Unauthorized, errorContent );
 
             case System.Net.HttpStatusCode.Conflict:
                 _logger.LogError( $"{requestTypeName}: Conflict: {errorContent}" );
-                return new ServiceReply<T?>( ServiceErrorType.Conflict, errorContent );
+                return new ApiReply<T?>( ServiceErrorType.Conflict, errorContent );
 
             case System.Net.HttpStatusCode.InternalServerError:
                 _logger.LogError( $"{requestTypeName}: Server error: {errorContent}" );
-                return new ServiceReply<T?>( ServiceErrorType.ServerError, errorContent );
+                return new ApiReply<T?>( ServiceErrorType.ServerError, errorContent );
 
             default:
                 _logger.LogError( $"{requestTypeName}: Other error: {httpResponse.StatusCode}, Content: {errorContent}" );
-                return new ServiceReply<T?>( ServiceErrorType.ServerError, $"Error: {httpResponse.StatusCode}" );
+                return new ApiReply<T?>( ServiceErrorType.ServerError, $"Error: {httpResponse.StatusCode}" );
         }
     }
     
-    ServiceReply<T?> HandleHttpException<T>( Exception e, string requestType )
+    ApiReply<T?> HandleHttpException<T>( Exception e, string requestType )
     {
         _logger.LogError( e, $"{requestType}: Exception occurred while sending API request." );
-        return new ServiceReply<T?>( ServiceErrorType.ServerError, e.Message );
+        return new ApiReply<T?>( ServiceErrorType.ServerError, e.Message );
     }
     void SetAuthHttpHeader( string? token )
     {

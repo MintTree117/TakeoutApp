@@ -1,14 +1,14 @@
 using Application.Models;
 using Application.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Application.Pages;
 
 public sealed partial class Home : PageBase
 {
-    [Inject] IHttpService _httpService { get; init; } = default!;
-    
-    event Action? OptionsLoaded;
+    [Inject] IJSRuntime JsRuntime { get; init; } = default!;
+    [Inject] MenuManager MenuManager { get; init; } = default!;
     
     MenuCategory[] _categories = [ ];
     MenuItem[] _items = [ ];
@@ -18,53 +18,57 @@ public sealed partial class Home : PageBase
     {
         await base.OnInitializedAsync();
 
-        List<Task> tasks =
+        List<Task<bool>> tasks =
         [
             LoadMenuCategories(),
-            LoadMenuItems()
+            LoadMenuItems(),
+            LoadMenuOptions()
         ];
 
         await Task.WhenAll( tasks );
 
-        _ = LoadMenuOptions();
+        StateHasChanged();
+        
+        if ( tasks.Any( t => !t.Result ) )
+            Alert( AlertType.Danger, "Failed to fetch some parts of the menu!" );
     }
 
-    async Task LoadMenuCategories()
+    async Task<bool> LoadMenuCategories()
     {
-        ServiceReply<List<MenuCategory>?> reply = 
-            await _httpService.TryGetRequest<List<MenuCategory>>( "api/menu/get/categories" );
-
-        if ( reply.Data is null )
-        {
-            return;
-        }
-
-        _categories = reply.Data.ToArray();
+        ApiReply<List<MenuCategory>?> reply = await MenuManager.GetCategories();
+        _categories = reply.Data?.ToArray() ?? Array.Empty<MenuCategory>();
+        
+        if ( reply.Data is not null ) 
+            return true;
+        
+        Logger.LogError( reply.Details() );
+        return false;
     }
-    async Task LoadMenuItems()
+    async Task<bool> LoadMenuItems()
     {
-        ServiceReply<List<MenuItem>?> reply =
-            await _httpService.TryGetRequest<List<MenuItem>>( "api/menu/get/items" );
+        ApiReply<List<MenuItem>?> reply = await MenuManager.GetItems();
+        _items = reply.Data?.ToArray() ?? Array.Empty<MenuItem>();
 
-        if ( reply.Data is null )
-        {
-            return;
-        }
+        if ( reply.Data is not null )
+            return true;
 
-        _items = reply.Data.ToArray();
+        Logger.LogError( reply.Details() );
+        return false;
     }
-    async Task LoadMenuOptions()
+    async Task<bool> LoadMenuOptions()
     {
-        ServiceReply<MenuOptions?> reply =
-            await _httpService.TryGetRequest<MenuOptions>( "api/menu/get/options" );
+        ApiReply<MenuOptions?> reply = await MenuManager.GetOptions();
+        _options = reply.Data ?? new MenuOptions();
 
-        if ( reply.Data is null )
-        {
-            return;
-        }
+        if ( reply.Data is not null )
+            return true;
 
-        _options = reply.Data;
+        Logger.LogError( reply.Details() );
+        return false;
+    }
 
-        OptionsLoaded?.Invoke();
+    async Task ScrollToCategory( int categoryId )
+    {
+        await JsRuntime.InvokeVoidAsync( "scrollToCategory", categoryId );
     }
 }

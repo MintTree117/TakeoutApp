@@ -1,7 +1,7 @@
 ﻿@using Application.Services
-@using Application.Dtos
+@using Application.Models
 @implements IDisposable
-
+3
 <header class="px-3 py-3 border-bottom">
     <nav class="d-flex flex-row align-items-center justify-content-between">
         <a href="home">
@@ -50,8 +50,8 @@
             }
             <a href="cart">
                 <i class="fa fa-shopping-cart fa-2x"></i>
-                <span>@_cartSummary.Count</span>
-                <span>@_cartSummary.Price</span>
+                <span>@_cart.Items.Count</span>
+                <span>@_cart.GetPrice()</span>
             </a>
         </div>
     </nav>
@@ -59,28 +59,28 @@
 
 @code
 {
-    [Inject] IIdentityManager IdentityManager { get; init; } = default!;
-    [Inject] ICartManager CartManager { get; init; } = default!;
+    [Inject] IdentityManager IdentityManager { get; init; } = default!;
+    //[Inject] CartManager CartManager { get; init; } = default!;
     [Inject] NavigationManager NavigationManager { get; init; } = default!;
-    [Inject] AppState AppState { get; init; } = default!;
+    [Inject] AppStateService AppStateService { get; init; } = default!;
     
-    UserDto? _user = null;
-    CartSummary _cartSummary = new();
+    User? _user = null;
+    Cart _cart = new();
 
     string _sidebarCss = "";
     bool _sidebarActive = false;
 
     public void Dispose()
     {
-        AppState.OnIdentityChanged -= OnChangeIdentity;
-        AppState.OnCartChanged -= OnChangeCart;
+        AppStateService.IdentityChanged -= OnIdentityChanged;
+        AppStateService.CartChanged -= OnCartChanged;
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await base.OnInitializedAsync();
-        AppState.OnIdentityChanged += OnChangeIdentity;
-        AppState.OnCartChanged += OnChangeCart;
+        base.OnInitialized();
+        AppStateService.IdentityChanged += OnIdentityChanged;
+        AppStateService.CartChanged += OnCartChanged;
         NavigationManager.LocationChanged += OnLocationChanged;
     }
 
@@ -89,22 +89,6 @@
         await IdentityManager.Logout();
         NavigationManager.NavigateTo( "/" );
     }
-    
-    void OnChangeIdentity( UserDto? user )
-    {
-        _user = user;
-        StateHasChanged();
-    }
-    void OnChangeCart( CartSummary summary )
-    {
-        _cartSummary = summary;
-        StateHasChanged();
-    }
-    void OnLocationChanged( object? obj, LocationChangedEventArgs args )
-    {
-        //InvokeAsync( OnChangeIdentity );
-    }
-
     void ToggleSidebar()
     {
         _sidebarActive = !_sidebarActive;
@@ -112,7 +96,22 @@
         _sidebarCss = _sidebarActive
             ? "d-block position-absolute"
             : "d-none";
-        
+
         StateHasChanged();
+    }
+    
+    void OnIdentityChanged( User? user )
+    {
+        _user = user;
+        StateHasChanged();
+    }
+    void OnCartChanged( Cart cart )
+    {
+        _cart = cart;
+        StateHasChanged();
+    }
+    void OnLocationChanged( object? obj, LocationChangedEventArgs args )
+    {
+        //InvokeAsync( OnChangeIdentity );
     }
 }

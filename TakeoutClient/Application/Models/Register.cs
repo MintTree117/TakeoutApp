@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Application.Dtos;
+namespace Application.Models;
 
-public sealed record RegisterDto
+public sealed record Register
 {
     [Required, EmailAddress]
     public string Email { get; set; } = string.Empty;
