@@ -4,33 +4,27 @@ using Microsoft.AspNetCore.Components;
 
 namespace Application.Pages;
 
-public sealed partial class LoginRegister( ILogger<LoginRegister> logger ) : PageBase( logger )
+public sealed partial class LoginRegister : PageBase
 {
     [Inject] NavigationManager Navigation { get; init; } = default!;
     [Inject] IHttpService HttpService { get; init; } = default!;
-    [Inject] ILocalIdentityCache IdentityCache { get; init; } = default!;
+    [Inject] IIdentityManager IdentityManager { get; init; } = default!;
+    [Inject] ICartManager CartManager { get; init; } = default!;
 
     readonly LoginDto _loginDto = new();
     readonly RegisterDto _registerDto = new();
 
     async Task Login()
     {
-        ServiceReply<UserDto?> loginReply = await HttpService.TryPostRequest<UserDto>( "api/users/login", _loginDto );
-
-        if ( loginReply.Data is null )
+        UserDto? user = await IdentityManager.Login( _loginDto );
+        
+        if ( user is null )
         {
-            Alert( AlertType.Danger, loginReply.Message );
+            Alert( AlertType.Danger, "An error occured!" );
             return;
         }
-
-        await IdentityCache.SetIdentity( loginReply.Data );
-    }
-    async Task Logout()
-    {
-        Task local = IdentityCache.SetIdentity( null );
-        Task<ServiceReply<UserDto?>> server = HttpService.TryPutRequest<UserDto>( "api/users/logout" );
-
-        await Task.WhenAll( local, server );
+        
+        await CartManager.UpdateServerCart( user );
 
         Navigation.NavigateTo( "/" );
     }

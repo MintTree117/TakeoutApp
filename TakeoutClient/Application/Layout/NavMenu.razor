@@ -1,15 +1,118 @@
-﻿<header class="px-3 py-3 border-bottom">
+﻿@using Application.Services
+@using Application.Dtos
+@implements IDisposable
+
+<header class="px-3 py-3 border-bottom">
     <nav class="d-flex flex-row align-items-center justify-content-between">
         <a href="home">
             <img src="favicon.png" alt="home" style="max-height: 50px; width:  auto;"/>
         </a>
         <div>
-            <a href="profile">
-                <i class="fa fa-user fa-2x"></i>
-            </a>
+            @if ( _user is null )
+            {
+                <a href="login">
+                    <i class="fa fa-user fa-2x"></i>
+                </a>
+            }
+            else
+            {
+                <div class="dropdown">
+                    <button class="btn btn-link" @onclick="ToggleSidebar">
+                        <i class="fa fa-user fa-2x"></i>
+                    </button>
+                    
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="orders">Orders</a>
+                        </li>
+                        <li>
+                            <a href="account">Account</a>
+                        </li>
+
+                        @if ( _user!.IsAdmin )
+                        {
+                            <li>
+                                <a href="account">Create Menu Item</a>
+                            </li>
+                            <li>
+                                <a href="account">Edit Categories</a>
+                            </li>
+                            <li>
+                                <a href="account">Edit Menu Options</a>
+                            </li>
+                        }
+
+                        <li>
+                            <a href="logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            }
             <a href="cart">
                 <i class="fa fa-shopping-cart fa-2x"></i>
+                <span>@_cartSummary.Count</span>
+                <span>@_cartSummary.Price</span>
             </a>
         </div>
     </nav>
 </header>
+
+@code
+{
+    [Inject] IIdentityManager IdentityManager { get; init; } = default!;
+    [Inject] ICartManager CartManager { get; init; } = default!;
+    [Inject] NavigationManager NavigationManager { get; init; } = default!;
+    [Inject] AppState AppState { get; init; } = default!;
+    
+    UserDto? _user = null;
+    CartSummary _cartSummary = new();
+
+    string _sidebarCss = "";
+    bool _sidebarActive = false;
+
+    public void Dispose()
+    {
+        AppState.OnIdentityChanged -= OnChangeIdentity;
+        AppState.OnCartChanged -= OnChangeCart;
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        AppState.OnIdentityChanged += OnChangeIdentity;
+        AppState.OnCartChanged += OnChangeCart;
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    async Task Logout()
+    {
+        await IdentityManager.Logout();
+        NavigationManager.NavigateTo( "/" );
+    }
+    
+    void OnChangeIdentity( UserDto? user )
+    {
+        _user = user;
+        StateHasChanged();
+    }
+    void OnChangeCart( CartSummary summary )
+    {
+        _cartSummary = summary;
+        StateHasChanged();
+    }
+    void OnLocationChanged( object? obj, LocationChangedEventArgs args )
+    {
+        //InvokeAsync( OnChangeIdentity );
+    }
+
+    void ToggleSidebar()
+    {
+        _sidebarActive = !_sidebarActive;
+
+        _sidebarCss = _sidebarActive
+            ? "d-block position-absolute"
+            : "d-none";
+        
+        StateHasChanged();
+    }
+}

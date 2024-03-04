@@ -5,12 +5,7 @@ namespace Application.Pages;
 public abstract class PageBase : ComponentBase
 {
     public event Action<AlertType, string>? OnAlert;
-    readonly ILogger<PageBase> Logger;
-    
-    protected PageBase( ILogger<PageBase> logger )
-    {
-        Logger = logger;
-    }
+    [Inject] ILogger<PageBase> Logger { get; init; } = default!;
 
     protected void Alert( AlertType type, string message )
     {

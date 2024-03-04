@@ -1,5 +1,6 @@
 using Api.Errors;
 using Api.Features.Identity.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace Api.Features.Identity;
@@ -8,16 +9,18 @@ public static class IdentityEndpoints
 {
     public static void MapIdentityEndpoints( this IEndpointRouteBuilder app )
     {
-        app.MapPost( "api/email-exists",
+        app.MapPost( "api/identity/emailexists",
             async ( string email, UserManager<IdentityUser> userManager ) => 
                 Results.Ok( await userManager.FindByEmailAsync( email ) is not null ) );
         
-        app.MapPost( "api/login", 
+        app.MapPost( "api/identity/login", 
             async ( LoginDto login, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IJwtService jwtService ) => {
-                IdentityUser? user = await userManager.FindByEmailAsync( login.Email );
+                IdentityUser? user =
+                    await userManager.FindByEmailAsync( login.EmailOrUsername ) ??
+                    await userManager.FindByNameAsync( login.EmailOrUsername );
 
                 if ( user is null )
-                    return Results.NotFound( new ApiError( ApiErrorType.NotFound, "User with email wasn't found" ) );
+                    return Results.NotFound( new ApiError( ApiErrorType.NotFound, "User wasn't found" ) );
 
                 SignInResult result = await signInManager.CheckPasswordSignInAsync( user, login.Password, false );
 
@@ -31,8 +34,20 @@ public static class IdentityEndpoints
                     Token = jwtService.CreateToken( user )
                 } );
             } );
+        
+        app.MapPost( "api/identity/logout",
+            [Authorize] async ( HttpContext http, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IJwtService jwtService ) => {
+                IdentityUser? user = await userManager.FindByEmailAsync( http.User.Identity?.Name ?? "" );
 
-        app.MapPost( "api/register",
+                if ( user is null )
+                    return Results.NotFound( new ApiError( ApiErrorType.NotFound, "User wasn't found" ) );
+
+                await signInManager.SignOutAsync();
+
+                return Results.Ok( "User signed out." );
+            } );
+
+        app.MapPost( "api/identity/register",
             async ( RegisterDto register, UserManager<IdentityUser> userManager, IJwtService jwtService ) => {
                 IdentityUser user = new()
                 {

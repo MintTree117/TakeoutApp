@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Application.Pages;
 
-public sealed partial class Home( ILogger<Home> logger ) : PageBase( logger )
+public sealed partial class Home : PageBase
 {
     [Inject] IHttpService _httpService { get; init; } = default!;
     
