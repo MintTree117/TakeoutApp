@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Core.Persistence;
 
-public class IdentitySeed
+public sealed class IdentitySeed
 {
     public static async Task SeedUsersAsync( UserManager<IdentityUser> userManager )
     {

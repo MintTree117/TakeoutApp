@@ -33,12 +33,13 @@ app.UseHttpsRedirection();
 
 using IServiceScope scope = app.Services.CreateScope();
 IServiceProvider services = scope.ServiceProvider;
-//var context = services.GetRequiredService<EfContext>();
+var context = services.GetRequiredService<EfContext>();
 var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 var logger = services.GetRequiredService<ILogger<Program>>();
 
 try
 {
+    await MenuSeed.SeedMenuAsync( context, 10, 6, 6, 3 );
     await IdentitySeed.SeedUsersAsync( userManager );
 }
 catch ( Exception e )

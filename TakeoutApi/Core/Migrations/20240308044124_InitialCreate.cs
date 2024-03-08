@@ -189,7 +189,7 @@ namespace Core.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<double>(type: "decimal(18,2)", nullable: false),
                     SalePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     ImageUrl = table.Column<string>(type: "TEXT", maxLength: 120, nullable: true),
                     MenuCategoryId = table.Column<int>(type: "INTEGER", nullable: false)
@@ -228,24 +228,24 @@ namespace Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MenuItemMenuOptionGroup",
+                name: "MenuItemOptionGroups",
                 columns: table => new
                 {
-                    MenuItemsId = table.Column<int>(type: "INTEGER", nullable: false),
-                    MenuOptionGroupsId = table.Column<int>(type: "INTEGER", nullable: false)
+                    MenuItemId = table.Column<int>(type: "INTEGER", nullable: false),
+                    MenuOptionGroupId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MenuItemMenuOptionGroup", x => new { x.MenuItemsId, x.MenuOptionGroupsId });
+                    table.PrimaryKey("PK_MenuItemOptionGroups", x => new { x.MenuItemId, x.MenuOptionGroupId });
                     table.ForeignKey(
-                        name: "FK_MenuItemMenuOptionGroup_MenuItems_MenuItemsId",
-                        column: x => x.MenuItemsId,
+                        name: "FK_MenuItemOptionGroups_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
                         principalTable: "MenuItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MenuItemMenuOptionGroup_MenuOptionGroups_MenuOptionGroupsId",
-                        column: x => x.MenuOptionGroupsId,
+                        name: "FK_MenuItemOptionGroups_MenuOptionGroups_MenuOptionGroupId",
+                        column: x => x.MenuOptionGroupId,
                         principalTable: "MenuOptionGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -289,9 +289,9 @@ namespace Core.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MenuItemMenuOptionGroup_MenuOptionGroupsId",
-                table: "MenuItemMenuOptionGroup",
-                column: "MenuOptionGroupsId");
+                name: "IX_MenuItemOptionGroups_MenuOptionGroupId",
+                table: "MenuItemOptionGroups",
+                column: "MenuOptionGroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuItems_MenuCategoryId",
@@ -323,7 +323,7 @@ namespace Core.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "MenuItemMenuOptionGroup");
+                name: "MenuItemOptionGroups");
 
             migrationBuilder.DropTable(
                 name: "MenuOptions");

@@ -8,7 +8,8 @@ public sealed class MenuOptionGroup
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
 
-    public List<MenuItem> MenuItems { get; set; } = [ ];
+    public List<MenuOption> MenuOptions { get; set; } = [ ];
+    public List<MenuItemOptionGroup> MenuItemOptionGroups { get; set; } = [ ];
 
     public class MenuOptionGroupConfiguration : IEntityTypeConfiguration<MenuOptionGroup>
     {

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core.Migrations
 {
     [DbContext(typeof(EfContext))]
-    [Migration("20240303003907_InitialCreate")]
+    [Migration("20240308044124_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -54,7 +54,7 @@ namespace Core.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Price")
+                    b.Property<double>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("SalePrice")
@@ -65,6 +65,21 @@ namespace Core.Migrations
                     b.HasIndex("MenuCategoryId");
 
                     b.ToTable("MenuItems");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MenuItemOptionGroup", b =>
+                {
+                    b.Property<int>("MenuItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MenuOptionGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("MenuItemId", "MenuOptionGroupId");
+
+                    b.HasIndex("MenuOptionGroupId");
+
+                    b.ToTable("MenuItemOptionGroups");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MenuOption", b =>
@@ -108,21 +123,6 @@ namespace Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MenuOptionGroups");
-                });
-
-            modelBuilder.Entity("MenuItemMenuOptionGroup", b =>
-                {
-                    b.Property<int>("MenuItemsId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MenuOptionGroupsId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("MenuItemsId", "MenuOptionGroupsId");
-
-                    b.HasIndex("MenuOptionGroupsId");
-
-                    b.ToTable("MenuItemMenuOptionGroup");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -320,7 +320,7 @@ namespace Core.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MenuItem", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MenuCategory", "MenuCategory")
-                        .WithMany()
+                        .WithMany("MenuItems")
                         .HasForeignKey("MenuCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -328,30 +328,34 @@ namespace Core.Migrations
                     b.Navigation("MenuCategory");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.MenuItemOptionGroup", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MenuItem", "MenuItem")
+                        .WithMany("MenuItemOptionGroups")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MenuOptionGroup", "MenuOptionGroup")
+                        .WithMany("MenuItemOptionGroups")
+                        .HasForeignKey("MenuOptionGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MenuItem");
+
+                    b.Navigation("MenuOptionGroup");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.MenuOption", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MenuOptionGroup", "MenuOptionGroup")
-                        .WithMany()
+                        .WithMany("MenuOptions")
                         .HasForeignKey("MenuOptionGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("MenuOptionGroup");
-                });
-
-            modelBuilder.Entity("MenuItemMenuOptionGroup", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MenuItem", null)
-                        .WithMany()
-                        .HasForeignKey("MenuItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MenuOptionGroup", null)
-                        .WithMany()
-                        .HasForeignKey("MenuOptionGroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -403,6 +407,23 @@ namespace Core.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MenuCategory", b =>
+                {
+                    b.Navigation("MenuItems");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MenuItem", b =>
+                {
+                    b.Navigation("MenuItemOptionGroups");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MenuOptionGroup", b =>
+                {
+                    b.Navigation("MenuItemOptionGroups");
+
+                    b.Navigation("MenuOptions");
                 });
 #pragma warning restore 612, 618
         }

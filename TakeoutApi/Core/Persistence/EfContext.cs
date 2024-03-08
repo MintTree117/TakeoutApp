@@ -15,6 +15,7 @@ public sealed class EfContext : IdentityDbContext
     public DbSet<MenuItem> MenuItems { get; set; }
     public DbSet<MenuOption> MenuOptions { get; set; }
     public DbSet<MenuOptionGroup> MenuOptionGroups { get; set; }
+    public DbSet<MenuItemOptionGroup> MenuItemOptionGroups { get; set; }
 
     protected override void OnModelCreating( ModelBuilder modelBuilder )
     {
@@ -23,5 +24,6 @@ public sealed class EfContext : IdentityDbContext
         modelBuilder.ApplyConfiguration( new MenuItem.MenuItemConfiguration() );
         modelBuilder.ApplyConfiguration( new MenuOption.MenuOptionConfiguration() );
         modelBuilder.ApplyConfiguration( new MenuOptionGroup.MenuOptionGroupConfiguration() );
+        modelBuilder.ApplyConfiguration( new MenuItemOptionGroup.MenuItemOptionGroupConfiguration() );
     }
 }

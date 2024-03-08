@@ -5,16 +5,16 @@ namespace Core.Domain.Entities;
 
 public sealed class MenuItem
 {
-    public int Id { get; private set; }
-    public string Name { get; private set; } = string.Empty;
-    public decimal Price { get; private set; }
-    public decimal? SalePrice { get; private set; }
-    public string? ImageUrl { get; private set; } = string.Empty;
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public double Price { get; set; }
+    public decimal? SalePrice { get; set; }
+    public string? ImageUrl { get; set; } = string.Empty;
 
-    public MenuCategory MenuCategory { get; private set; } = null!;
-    public int MenuCategoryId { get; private set; }
+    public MenuCategory MenuCategory { get; set; } = default!;
+    public int MenuCategoryId { get; set; }
 
-    public List<MenuOptionGroup> MenuOptionGroups { get; set; } = [ ];
+    public List<MenuItemOptionGroup> MenuItemOptionGroups { get; set; } = [ ];
 
     public class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
     {
@@ -38,12 +38,10 @@ public sealed class MenuItem
                 .Property( i => i.SalePrice )
                 .HasColumnType( "decimal(18,2)" );
             builder
-                .HasOne( c => c.MenuCategory )
-                .WithMany()
-                .HasForeignKey( i => i.MenuCategoryId );
-            builder
-                .HasMany( i => i.MenuOptionGroups )
-                .WithMany( g => g.MenuItems );
+                .HasOne( i => i.MenuCategory )
+                .WithMany( c => c.MenuItems )
+                .HasForeignKey( i => i.MenuCategoryId )
+                .IsRequired();
         }
     }
 }
